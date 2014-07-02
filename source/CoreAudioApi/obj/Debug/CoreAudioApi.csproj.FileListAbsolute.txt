@@ -1,0 +1,4 @@
+C:\Users\Davyd\Desktop\Dropbox\code\C#\TrayMonkey\CoreAudioApi\bin\Debug\CoreAudioApi.dll
+C:\Users\Davyd\Desktop\Dropbox\code\C#\TrayMonkey\CoreAudioApi\bin\Debug\CoreAudioApi.pdb
+C:\Users\Davyd\Desktop\Dropbox\code\C#\TrayMonkey\CoreAudioApi\obj\Debug\CoreAudioApi.dll
+C:\Users\Davyd\Desktop\Dropbox\code\C#\TrayMonkey\CoreAudioApi\obj\Debug\CoreAudioApi.pdb

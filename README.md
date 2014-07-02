@@ -19,3 +19,12 @@ When I have the time and need, I'd like to extend this tray app to respond to ap
 launches / closes, so you could, for instance, close your email application when opening
 Steam, or something similar. For now, it's just a handy way to not have to concern myself
 with setting the system volume to max when XBMC runs and reducing it afterwards.
+
+Please note that the TrayMonkey repo has a checkin of the CoreAudio API project,
+found at 
+
+http://www.codeproject.com/Articles/18520/Vista-Core-Audio-API-Master-Volume-Control
+
+This project is used to manipulate the system volume. All rights and kudos for that code
+go to the original author and it is at the discretion of the original author that
+I may remove this code. But I really hope I don't have to (:

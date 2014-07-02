@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrayMonkey", "TrayMonkey\TrayMonkey.csproj", "{DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrayMonkey.Tests", "TrayMonkey.Tests\TrayMonkey.Tests.csproj", "{10F0B1ED-94DE-4107-A075-D1697AD72D6E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5} = {DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5}
+		{9F1076AA-63DF-4128-9C10-FD65E425C783} = {9F1076AA-63DF-4128-9C10-FD65E425C783}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreAudioApi", "CoreAudioApi\CoreAudioApi.csproj", "{9F1076AA-63DF-4128-9C10-FD65E425C783}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2B51FE1E-5805-4C38-828E-766F8A2FFED6}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD5E7C29-49AB-4B04-BFD7-CC1DBD45E8B5}.Release|x86.ActiveCfg = Release|Any CPU
+		{10F0B1ED-94DE-4107-A075-D1697AD72D6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10F0B1ED-94DE-4107-A075-D1697AD72D6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10F0B1ED-94DE-4107-A075-D1697AD72D6E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10F0B1ED-94DE-4107-A075-D1697AD72D6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10F0B1ED-94DE-4107-A075-D1697AD72D6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10F0B1ED-94DE-4107-A075-D1697AD72D6E}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F1076AA-63DF-4128-9C10-FD65E425C783}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F1076AA-63DF-4128-9C10-FD65E425C783}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F1076AA-63DF-4128-9C10-FD65E425C783}.Debug|x86.ActiveCfg = Debug|x86
+		{9F1076AA-63DF-4128-9C10-FD65E425C783}.Debug|x86.Build.0 = Debug|x86
+		{9F1076AA-63DF-4128-9C10-FD65E425C783}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F1076AA-63DF-4128-9C10-FD65E425C783}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F1076AA-63DF-4128-9C10-FD65E425C783}.Release|x86.ActiveCfg = Release|x86
+		{9F1076AA-63DF-4128-9C10-FD65E425C783}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,10 @@
+source/packages/NSubstitute.1.7.2.0/
+source/packages/NUnit.2.6.3/
+source/packages/PeanutButter.INI.1.0.56/
+source/packages/PeanutButter.RandomGenerators.1.0.56/
+source/packages/PeanutButter.TrayIcon.1.0.56/
+source/packages/PeanutButter.Utils.1.0.56/
+source/TrayMonkey/obj/
+source/TrayMonkey/bin/
+source/TrayMonkey.Tests/obj/
+source/TrayMonkey.Tests/bin/
