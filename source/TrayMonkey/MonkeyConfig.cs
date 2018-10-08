@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PeanutButter.INI;
+using PeanutButter.INIFile;
 
 namespace TrayMonkey
 {
@@ -15,20 +12,16 @@ namespace TrayMonkey
 
     public class MonkeyConfig : IMonkeyConfig
     {
-        public IEnumerable<MonkeyRule> Rules
-        {
-            get { return _rules; }
-        }
+        public IEnumerable<MonkeyRule> Rules => _rules.ToArray();
 
         public int Heartbeat { get; private set; }
 
-        private IINIFile _iniFile;
+        private readonly IINIFile _iniFile;
         private List<MonkeyRule> _rules;
 
         public MonkeyConfig(IINIFile iniFile)
         {
-            if (iniFile == null) throw new ArgumentNullException("iniFile");
-            _iniFile = iniFile;
+            _iniFile = iniFile ?? throw new ArgumentNullException(nameof(iniFile));
             LoadIniFile();
         }
 
@@ -41,11 +34,12 @@ namespace TrayMonkey
         private void SetHeartbeat()
         {
             Heartbeat = 500;
-            if (!_iniFile.HasSection("")) return;
+            if (!_iniFile.HasSection(""))
+                return;
+
             var configuredHeartbeat = GetSettingValueFrom(_iniFile[""], "heartbeat");
-            int configvalue;
-            if (Int32.TryParse(configuredHeartbeat, out configvalue))
-                Heartbeat = configvalue;
+            if (int.TryParse(configuredHeartbeat, out var configValue))
+                Heartbeat = configValue;
         }
 
         private void LoadRules()
@@ -53,30 +47,39 @@ namespace TrayMonkey
             _rules = new List<MonkeyRule>();
             foreach (var section in _iniFile.Sections)
             {
-                if (String.IsNullOrEmpty(section)) continue;
+                if (string.IsNullOrEmpty(section)) continue;
                 var sectionData = _iniFile[section];
-                _rules.Add(new MonkeyRule(section, GetProcessPathFrom(sectionData), GetOnActivatedFrom(sectionData), GetOnDeactivatedFrom(sectionData)));
+                _rules.Add(
+                    new MonkeyRule(
+                        section,
+                        GetProcessPathFrom(sectionData),
+                        GetOnActivatedFrom(sectionData),
+                        GetOnDeactivatedFrom(sectionData)));
             }
         }
 
-        private string GetProcessPathFrom(Dictionary<string, string> value)
+        private string GetProcessPathFrom(IDictionary<string, string> value)
         {
             return GetSettingValueFrom(value, "Process");
         }
 
-        private string GetOnDeactivatedFrom(Dictionary<string, string> values)
+        private string GetOnDeactivatedFrom(IDictionary<string, string> values)
         {
             return GetSettingValueFrom(values, "OnDeactivated");
         }
 
-        private string GetOnActivatedFrom(Dictionary<string, string> values)
+        private string GetOnActivatedFrom(IDictionary<string, string> values)
         {
             return GetSettingValueFrom(values, "OnActivated");
         }
 
-        private static string GetSettingValueFrom(Dictionary<string, string> values, string settingName)
+        private static string GetSettingValueFrom(
+            IDictionary<string, string> values,
+            string settingName)
         {
-            return (values.ContainsKey(settingName)) ? values[settingName] : null;
+            return (values.ContainsKey(settingName))
+                ? values[settingName]
+                : null;
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,7 +10,14 @@ using PeanutButter.Utils;
 
 namespace TrayMonkey
 {
+    public interface IMonkey
+    {
+        void Start();
+        void Stop();
+    }
+
     public class Monkey
+        : IMonkey
     {
         private CancellationTokenSource _cancellationTokenSource;
         private Task _taskWaitable;
@@ -25,10 +30,8 @@ namespace TrayMonkey
 
         public Monkey(IMonkeyConfig config, IActiveProcessFinder activeProcessFinder)
         {
-            if (config == null) throw new ArgumentNullException("config");
-            if (activeProcessFinder == null) throw new ArgumentNullException("activeProcessFinder");
-            _config = config;
-            _activeProcessFinder = activeProcessFinder;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _activeProcessFinder = activeProcessFinder ?? throw new ArgumentNullException(nameof(activeProcessFinder));
             _runActions = new Dictionary<string, Action<string[]>>(StringComparer.OrdinalIgnoreCase);
             SetupRunActions();
         }
@@ -71,7 +74,7 @@ namespace TrayMonkey
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Unable to set system volume: " + ex.Message);
+                    MessageBox.Show($"Unable to set system volume: {ex.Message}");
                 }
             };
         }
@@ -86,8 +89,8 @@ namespace TrayMonkey
                 for (var i = 0; i < defaultDeviceEndpoint.Channels.Length; i++)
                     channels.Add(defaultDeviceEndpoint.Channels[i]);
                 var originalVolume = channels.Select(c => c.VolumeLevelScalar).Max();
-                Debug.WriteLine(String.Format("Setting system volume to: {0}", volume));
-                Debug.WriteLine(String.Format("Saving restore volume of: {0}", originalVolume));
+                Debug.WriteLine($"Setting system volume to: {volume}");
+                Debug.WriteLine($"Saving restore volume of: {originalVolume}");
                 foreach (var channel in channels)
                     channel.VolumeLevelScalar = volume;
                 return originalVolume;

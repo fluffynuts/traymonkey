@@ -2,10 +2,10 @@
 {
     public class MonkeyRule
     {
-        public string Name { get; protected set; }
-        public string Process { get; protected set; }
-        public string OnActivated { get; protected set; }
-        public string OnDeactivated { get; protected set; }
+        public string Name { get; }
+        public string Process { get; }
+        public string OnActivated { get; }
+        public string OnDeactivated { get; }
 
         public MonkeyRule(string name, string process, string onActivated, string onDeactivated)
         {

@@ -2,3 +2,9 @@ C:\Users\Davyd\Desktop\Dropbox\code\C#\TrayMonkey\CoreAudioApi\bin\Debug\CoreAud
 C:\Users\Davyd\Desktop\Dropbox\code\C#\TrayMonkey\CoreAudioApi\bin\Debug\CoreAudioApi.pdb
 C:\Users\Davyd\Desktop\Dropbox\code\C#\TrayMonkey\CoreAudioApi\obj\Debug\CoreAudioApi.dll
 C:\Users\Davyd\Desktop\Dropbox\code\C#\TrayMonkey\CoreAudioApi\obj\Debug\CoreAudioApi.pdb
+C:\code\opensource\traymonkey\source\CoreAudioApi\bin\Debug\CoreAudioApi.dll
+C:\code\opensource\traymonkey\source\CoreAudioApi\bin\Debug\CoreAudioApi.pdb
+C:\code\opensource\traymonkey\source\CoreAudioApi\obj\Debug\CoreAudioApi.csprojAssemblyReference.cache
+C:\code\opensource\traymonkey\source\CoreAudioApi\obj\Debug\CoreAudioApi.csproj.CoreCompileInputs.cache
+C:\code\opensource\traymonkey\source\CoreAudioApi\obj\Debug\CoreAudioApi.dll
+C:\code\opensource\traymonkey\source\CoreAudioApi\obj\Debug\CoreAudioApi.pdb

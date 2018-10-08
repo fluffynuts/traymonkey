@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TrayMonkey</RootNamespace>
     <AssemblyName>TrayMonkey</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -37,17 +37,17 @@
     <ApplicationIcon>face_monkey.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PeanutButter.INI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PeanutButter.INI.1.0.56\lib\net40\PeanutButter.INI.dll</HintPath>
+    <Reference Include="PeanutButter.INI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\PeanutButter.INI.1.2.249\lib\net452\PeanutButter.INI.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="PeanutButter.TrayIcon, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PeanutButter.TrayIcon.1.0.56\lib\net40\PeanutButter.TrayIcon.dll</HintPath>
+    <Reference Include="PeanutButter.TrayIcon, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\PeanutButter.TrayIcon.1.2.249\lib\net452\PeanutButter.TrayIcon.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="PeanutButter.Utils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PeanutButter.Utils.1.0.56\lib\net40\PeanutButter.Utils.dll</HintPath>
+    <Reference Include="PeanutButter.Utils, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\PeanutButter.Utils.1.2.249\lib\net452\PeanutButter.Utils.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -62,9 +62,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveProcessFinder.cs" />
+    <Compile Include="Bootstrapper.cs" />
+    <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
+    <Compile Include="DryIoc\Container.cs" />
+    <Compile Include="DryIoc\FastExpressionCompiler.cs" />
+    <Compile Include="DryIoc\ImTools.cs" />
+    <Compile Include="InbuiltActions\IMonkeyAction.cs" />
     <Compile Include="Monkey.cs" />
     <Compile Include="MonkeyConfig.cs" />
     <Compile Include="MonkeyRule.cs" />
+    <Compile Include="MonkeyTrayIcon.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -112,30 +119,4 @@
     <Content Include="face_monkey.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>mkdir $(SolutionDir)bin
-copy $(TargetDir)$(ProjectName).exe $(SolutionDir)bin
-copy $(TargetDir)$(ProjectName).exe.config $(SolutionDir)bin
-copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)bin
-copy $(TargetDir)CoreAudioApi.dll $(SolutionDir)bin
-copy $(TargetDir)CoreAudioApi.pdb $(SolutionDir)bin
-copy $(TargetDir)PeanutButter.Utils.dll $(SolutionDir)bin
-copy $(TargetDir)PeanutButter.TrayIcon.dll $(SolutionDir)bin
-copy $(TargetDir)PeanutButter.INI.dll $(SolutionDir)bin
-</PostBuildEvent>
-  </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
