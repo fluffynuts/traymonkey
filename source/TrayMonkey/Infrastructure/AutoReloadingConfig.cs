@@ -5,7 +5,13 @@ using PeanutButter.TinyEventAggregator;
 
 namespace TrayMonkey.Infrastructure
 {
-    public class AutoReloadingConfig : INIFile
+    public interface IAutoReloadingConfig : IINIFile
+    {
+        void Watch();
+        void Stop();
+    }
+
+    public class AutoReloadingConfig : INIFile, IAutoReloadingConfig
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IConfig _config;
@@ -17,7 +23,11 @@ namespace TrayMonkey.Infrastructure
         {
             _eventAggregator = eventAggregator;
             _config = config;
-            _watcher = new FileSystemWatcher(System.IO.Path.GetDirectoryName(config.ConfigFile));
+            _watcher = new FileSystemWatcher(System.IO.Path.GetDirectoryName(config.ConfigFile))
+            {
+                Filter = "*.ini",
+                EnableRaisingEvents = true
+            };
         }
 
         public void Watch()

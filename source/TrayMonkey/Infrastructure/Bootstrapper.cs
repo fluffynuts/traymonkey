@@ -95,14 +95,9 @@ namespace TrayMonkey.Infrastructure
             IContainer container)
         {
             container.RegisterDelegate<IINIFile>(
-                resolverContext =>
-                {
-                    var config = new AutoReloadingConfig(
-                        resolverContext.Resolve<IEventAggregator>(),
-                        resolverContext.Resolve<IConfig>());
-                    config.Watch();
-                    return config;
-                },
+                resolverContext => new AutoReloadingConfig(
+                    resolverContext.Resolve<IEventAggregator>(),
+                    resolverContext.Resolve<IConfig>()),
                 Reuse.Singleton);
         }
     }

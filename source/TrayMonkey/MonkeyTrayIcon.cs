@@ -24,16 +24,19 @@ namespace TrayMonkey
         private readonly IMonkey _monkey;
         private readonly IConfig _config;
         private readonly ITrayIcon _trayIcon;
+        private readonly IAutoReloadingConfig _autoReloadingConfig;
 
         public MonkeyTrayIcon(
             IMonkey monkey,
             IConfig config,
-            ITrayIcon trayIcon
+            ITrayIcon trayIcon,
+            IAutoReloadingConfig autoReloadingConfig
         )
         {
             _monkey = monkey;
             _config = config;
             _trayIcon = trayIcon;
+            _autoReloadingConfig = autoReloadingConfig;
             SetupEditMenuItem();
             AddDivider();
             SetupExitMenuItem();
@@ -45,7 +48,12 @@ namespace TrayMonkey
                 "&Edit config...",
                 () =>
                 {
-                    Process.Start(_config.ConfigFile);
+                    var startInfo = new ProcessStartInfo()
+                    {
+                        FileName = _config.ConfigFile,
+                        UseShellExecute = true
+                    };
+                    Process.Start(startInfo);
                 });
         }
 
@@ -62,6 +70,7 @@ namespace TrayMonkey
                 {
                     _monkey.Stop();
                     _trayIcon.Hide();
+                    _autoReloadingConfig.Stop();
                     Application.Exit();
                 });
         }
@@ -69,6 +78,7 @@ namespace TrayMonkey
         public void Show()
         {
             _trayIcon.Show();
+            _autoReloadingConfig.Watch();
         }
 
         public void ShowNotification(
@@ -88,5 +98,4 @@ namespace TrayMonkey
                 closeAction);
         }
     }
-
 }
