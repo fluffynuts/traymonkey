@@ -1,13 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using DryIoc;
 using PeanutButter.INIFile;
+using PeanutButter.TinyEventAggregator;
+using PeanutButter.TrayIcon;
 using PeanutButter.Utils;
 using TrayMonkey.InbuiltActions;
 
-namespace TrayMonkey
+namespace TrayMonkey.Infrastructure
 {
     public static class Bootstrapper
     {
@@ -15,16 +15,23 @@ namespace TrayMonkey
         {
             var container = new Container();
             var thisAssembly = typeof(Bootstrapper).Assembly;
+            RegisterMonkeyActionsOn(container, thisAssembly);
             RegisterUserConfigOn(container);
             RegisterSingletonsOn(container);
             RegisterAllOneToOneOn(container, thisAssembly);
-            RegisterMonkeyActionsOn(container);
             return container;
         }
 
         private static void RegisterSingletonsOn(IContainer container)
         {
+            container.Register<IConfig, Config>(Reuse.Singleton);
+            container.RegisterDelegate<IEventAggregator>(_ => EventAggregator.Instance);
+            container.Register<ISystemVolume, SystemVolume>(Reuse.Singleton);
             container.Register<IMonkey, Monkey>(Reuse.Singleton);
+            container.RegisterDelegate<ITrayIcon>(
+                _ => new TrayIcon(Resources.face_monkey),
+                Reuse.Singleton);
+            container.Register<IProcessHelper, ProcessHelper>(Reuse.Singleton);
         }
 
         private static void RegisterMonkeyActionsOn(
@@ -33,7 +40,8 @@ namespace TrayMonkey
         {
             container.RegisterMany(
                 assemblies,
-                t => t == typeof(IMonkeyAction));
+                t => t == typeof(IMonkeyAction),
+                Reuse.Singleton);
         }
 
         private static void RegisterAllOneToOneOn(
@@ -53,7 +61,7 @@ namespace TrayMonkey
                                 var implementations = allTypes.Where(
                                     t => t.ImplementsServiceType(serviceType)
                                 ).ToArray();
-                                
+
                                 if (implementations.Length != 1)
                                 {
                                     return;
@@ -86,14 +94,15 @@ namespace TrayMonkey
         private static void RegisterUserConfigOn(
             IContainer container)
         {
-            var path = Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.ApplicationData),
-                "TrayMonkey",
-                "config.ini");
-            var config = new INIFile(path);
             container.RegisterDelegate<IINIFile>(
-                resolverContext => config,
+                resolverContext =>
+                {
+                    var config = new AutoReloadingConfig(
+                        resolverContext.Resolve<IEventAggregator>(),
+                        resolverContext.Resolve<IConfig>());
+                    config.Watch();
+                    return config;
+                },
                 Reuse.Singleton);
         }
     }

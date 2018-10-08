@@ -4,9 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using CoreAudioApi;
-using PeanutButter.Utils;
+using PeanutButter.TinyEventAggregator;
+using TrayMonkey.InbuiltActions;
+using TrayMonkey.Infrastructure;
+using static System.String;
 
 namespace TrayMonkey
 {
@@ -22,79 +23,19 @@ namespace TrayMonkey
         private CancellationTokenSource _cancellationTokenSource;
         private Task _taskWaitable;
         private IMonkeyConfig _config;
-        private readonly IActiveProcessFinder _activeProcessFinder;
+        private readonly IProcessHelper _processHelper;
         private Action _pendingDeactivationActions;
-        private Dictionary<string, Action<string[]>> _runActions;
-        private float? _restoreVolumeTo;
         private string _lastActiveProcess;
+        private readonly Dictionary<string, IMonkeyAction> _actions;
 
-        public Monkey(IMonkeyConfig config, IActiveProcessFinder activeProcessFinder)
+        public Monkey(
+            IMonkeyConfig config, 
+            IProcessHelper processHelper,
+            IMonkeyAction[] monkeyActions)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
-            _activeProcessFinder = activeProcessFinder ?? throw new ArgumentNullException(nameof(activeProcessFinder));
-            _runActions = new Dictionary<string, Action<string[]>>(StringComparer.OrdinalIgnoreCase);
-            SetupRunActions();
-        }
-
-        private void SetupRunActions()
-        {
-            SetupVolumeSetAction();
-            SetupVolumeRestoreAction();
-        }
-
-        private void SetupVolumeRestoreAction()
-        {
-            _runActions["restorevolume"] = (args) =>
-            {
-                float? restoreVolume;
-                lock (this)
-                {
-                    restoreVolume = _restoreVolumeTo;
-                    _restoreVolumeTo = null;
-                }
-                if (restoreVolume.HasValue)
-                    SetSystemVolumeTo(restoreVolume.Value);
-            };
-        }
-
-        private void SetupVolumeSetAction()
-        {
-            _runActions["setvolume"] = (args) =>
-            {
-                if (args.Length < 1) return;
-                var dd = new DecimalDecorator(args[0]);
-                try
-                {
-                    var floatVal = (float) dd.ToDecimal();
-                    var originalVolume = SetSystemVolumeTo(floatVal);
-                    lock (this)
-                    {
-                        _restoreVolumeTo = originalVolume;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Unable to set system volume: {ex.Message}");
-                }
-            };
-        }
-
-        private float SetSystemVolumeTo(float volume)
-        {
-            lock (this)
-            {
-                var enumerator = new MMDeviceEnumerator();
-                var defaultDeviceEndpoint = enumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia).AudioEndpointVolume;
-                var channels = new List<AudioEndpointVolumeChannel>();
-                for (var i = 0; i < defaultDeviceEndpoint.Channels.Length; i++)
-                    channels.Add(defaultDeviceEndpoint.Channels[i]);
-                var originalVolume = channels.Select(c => c.VolumeLevelScalar).Max();
-                Debug.WriteLine($"Setting system volume to: {volume}");
-                Debug.WriteLine($"Saving restore volume of: {originalVolume}");
-                foreach (var channel in channels)
-                    channel.VolumeLevelScalar = volume;
-                return originalVolume;
-            }
+            _processHelper = processHelper ?? throw new ArgumentNullException(nameof(processHelper));
+            _actions = monkeyActions.ToDictionary(a => a.Identifier, a => a, StringComparer.OrdinalIgnoreCase);
         }
 
         public void Start()
@@ -119,29 +60,45 @@ namespace TrayMonkey
 
         private void RunRuleRound()
         {
-            var activeProcess = _activeProcessFinder.GetActiveProcessFileName();
-            if (_lastActiveProcess == activeProcess) return;
-            _lastActiveProcess = activeProcess;
-            RunPendingDeactivationActions();
-            if (activeProcess == null)
+            lock (_config)
             {
-                return;
-            }
-            var matchingRules = _config.Rules.Where(r => activeProcess.ToLower().EndsWith(r.Process.ToLower()));
-            if (!matchingRules.Any())
-            {
+                _processHelper.UpdateActiveProcess();
+                var activeProcess = _processHelper.ForegroundProcessName;
+                if (_lastActiveProcess == activeProcess)
+                    return;
+
+                _lastActiveProcess = activeProcess;
                 RunPendingDeactivationActions();
-                return;
-            }
-            var toRunNow = matchingRules.Select(r => r.OnActivated).Where(s => !String.IsNullOrEmpty(s));
-            var toRunOnDeactivation = matchingRules.Select(r => r.OnDeactivated).Where(s => !String.IsNullOrEmpty(s));
-            foreach (var r in toRunNow)
-                Run(r);
-            _pendingDeactivationActions = () =>
-            {
-                foreach (var r in toRunOnDeactivation)
+                if (activeProcess == null)
+                {
+                    return;
+                }
+
+                var matchingRules = _config.Rules
+                    .Where(r => activeProcess.ToLower().EndsWith(r.Process.ToLower()))
+                    .ToArray();
+                if (!matchingRules.Any())
+                {
+                    RunPendingDeactivationActions();
+                    return;
+                }
+
+                var toRunNow = matchingRules
+                    .Select(r => r.OnActivated)
+                    .Where(s => !IsNullOrEmpty(s))
+                    .ToArray();
+                var toRunOnDeactivation = matchingRules
+                    .Select(r => r.OnDeactivated)
+                    .Where(s => !IsNullOrEmpty(s))
+                    .ToArray();
+                foreach (var r in toRunNow)
                     Run(r);
-            };
+                _pendingDeactivationActions = () =>
+                {
+                    foreach (var r in toRunOnDeactivation)
+                        Run(r);
+                };
+            }
         }
 
         private void RunPendingDeactivationActions()
@@ -156,9 +113,9 @@ namespace TrayMonkey
             var parts = s.Split(' ');
             var fn = parts[0];
             var args = parts.Length > 1 ? parts.Skip(1).ToArray() : new string[] {};
-            if (_runActions.ContainsKey(fn))
+            if (_actions.ContainsKey(fn))
             {
-                _runActions[fn](args);
+                _actions[fn].Run(args);
             }
         }
 

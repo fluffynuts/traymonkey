@@ -1,29 +1,17 @@
 ﻿using System;
 using System.Linq;
+using NSubstitute;
 using NUnit.Framework;
 using PeanutButter.INIFile;
 using PeanutButter.RandomGenerators;
+using PeanutButter.TinyEventAggregator;
+using TrayMonkey.Infrastructure;
 
 namespace TrayMonkey.Tests
 {
     [TestFixture]
     public class TestMonkeyConfig
     {
-        [Test]
-        public void Construct_WhenGivenNullINIFile_ShouldThrow()
-        {
-            //---------------Set up test pack-------------------
-
-            //---------------Assert Precondition----------------
-
-            //---------------Execute Test ----------------------
-            var ex = Assert.Throws<ArgumentNullException>(() => new MonkeyConfig(null));
-
-            //---------------Test Result -----------------------
-            Assert.AreEqual("iniFile", ex.ParamName);
-            
-        }
-
         [Test]
         public void Construct_WhenGivenINIFileWithNoSettings_ShouldHaveNoRules()
         {
@@ -33,7 +21,9 @@ namespace TrayMonkey.Tests
             //---------------Assert Precondition----------------
 
             //---------------Execute Test ----------------------
-            var sut = new MonkeyConfig(iniFile);
+            var sut = new MonkeyConfig(iniFile, Substitute.For<IEventAggregator>(),
+                                       Substitute.For<IConfig>(),
+                                       Substitute.For<INotifier>());
 
             //---------------Test Result -----------------------
             Assert.IsNotNull(sut.Rules);
@@ -62,7 +52,9 @@ namespace TrayMonkey.Tests
 
         private static MonkeyConfig CreateWith(INIFile iniFile)
         {
-            return new MonkeyConfig(iniFile);
+            return new MonkeyConfig(iniFile, Substitute.For<IEventAggregator>(),
+                                       Substitute.For<IConfig>(),
+                                       Substitute.For<INotifier>());
         }
 
         private static string RandString()

@@ -1,25 +1,57 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Diagnostics;
+using System.Windows.Forms;
 using PeanutButter.TrayIcon;
+using TrayMonkey.Infrastructure;
 
 namespace TrayMonkey
 {
     public interface IMonkeyTrayIcon
     {
         void Show();
+
+        void ShowNotification(
+            int timeout,
+            string title,
+            string text,
+            ToolTipIcon icon,
+            Action clickAction = null,
+            Action closeAction = null);
     }
-    
-    public class MonkeyTrayIcon: IMonkeyTrayIcon
+
+    public class MonkeyTrayIcon : IMonkeyTrayIcon
     {
         private readonly IMonkey _monkey;
-        private readonly TrayIcon _trayIcon;
+        private readonly IConfig _config;
+        private readonly ITrayIcon _trayIcon;
 
         public MonkeyTrayIcon(
-            IMonkey monkey
+            IMonkey monkey,
+            IConfig config,
+            ITrayIcon trayIcon
         )
         {
             _monkey = monkey;
-            _trayIcon = new TrayIcon(Resources.face_monkey);
+            _config = config;
+            _trayIcon = trayIcon;
+            SetupEditMenuItem();
+            AddDivider();
             SetupExitMenuItem();
+        }
+
+        private void SetupEditMenuItem()
+        {
+            _trayIcon.AddMenuItem(
+                "&Edit config...",
+                () =>
+                {
+                    Process.Start(_config.ConfigFile);
+                });
+        }
+
+        private void AddDivider()
+        {
+            _trayIcon.AddMenuSeparator();
         }
 
         private void SetupExitMenuItem()
@@ -38,5 +70,23 @@ namespace TrayMonkey
         {
             _trayIcon.Show();
         }
+
+        public void ShowNotification(
+            int timeout,
+            string title,
+            string text,
+            ToolTipIcon icon,
+            Action clickAction = null,
+            Action closeAction = null)
+        {
+            _trayIcon.ShowBalloonTipFor(
+                timeout,
+                title,
+                text,
+                icon,
+                clickAction,
+                closeAction);
+        }
     }
+
 }

@@ -7,7 +7,11 @@
         public string OnActivated { get; }
         public string OnDeactivated { get; }
 
-        public MonkeyRule(string name, string process, string onActivated, string onDeactivated)
+        public MonkeyRule(
+            string name,
+            string process,
+            string onActivated,
+            string onDeactivated)
         {
             Name = name;
             Process = process;

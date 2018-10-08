@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using ImTools;
 using PeanutButter.INIFile;
+using PeanutButter.TinyEventAggregator;
+using TrayMonkey.Infrastructure;
 
 namespace TrayMonkey
 {
@@ -19,16 +22,30 @@ namespace TrayMonkey
         private readonly IINIFile _iniFile;
         private List<MonkeyRule> _rules;
 
-        public MonkeyConfig(IINIFile iniFile)
+        public MonkeyConfig(
+            IINIFile iniFile,
+            IEventAggregator eventAggregator,
+            IConfig config,
+            INotifier notifier)
         {
             _iniFile = iniFile ?? throw new ArgumentNullException(nameof(iniFile));
-            LoadIniFile();
+            Refresh();
+            eventAggregator.GetEvent<ConfigurationReloadedEvent>()
+                .Subscribe(_ =>
+                {
+                    Refresh();
+                    notifier.ShowInfo("Configuration reloaded", $"Configuration reloaded from {config.ConfigFile}");
+                });
+            
         }
 
-        private void LoadIniFile()
+        public void Refresh()
         {
-            SetHeartbeat();
-            LoadRules();
+            lock (this)
+            {
+                SetHeartbeat();
+                LoadRules();
+            }
         }
 
         private void SetHeartbeat()
